@@ -1,6 +1,7 @@
 export default function TemplateCard({
   template,
   onPreview,
+  onEdit,
   thumbnailHtml
 }) {
 
@@ -112,16 +113,29 @@ export default function TemplateCard({
 
         <div className="template-actions">
 
-          {extension === "HTML" && (
+        {extension === "HTML" && (
 
-            <button
-              className="preview-button"
-              onClick={() =>
-                onPreview(template)
-              }
-            >
-              Preview
-            </button>
+    <button
+      className="preview-button"
+      onClick={() =>
+        onPreview(template)
+      }
+    >
+      Preview
+    </button>
+
+  )}
+
+  {extension === "HTML" && (
+
+    <button
+      className="edit-button"
+      onClick={() =>
+        onEdit(template)
+      }
+    >
+      Edit Content
+    </button>
 
           )}
 

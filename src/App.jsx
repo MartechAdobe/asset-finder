@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import TemplateEditor from "./components/TemplateEditor";
 import SearchBar from "./components/SearchBar";
 import CategoryFilters from "./components/CategoryFilters";
 import Results from "./components/Results";
@@ -14,6 +14,17 @@ import { decodeBase64 } from "./utils/decode";
 
 
 export default function App() {
+    const [editorTemplate, setEditorTemplate] =
+  useState(null);
+
+const [editorHtml, setEditorHtml] =
+  useState("");
+
+const [editorLoading, setEditorLoading] =
+  useState(false);
+
+const [editorError, setEditorError] =
+  useState("");
 
   const [results, setResults] = useState([]);
   const [query, setQuery] = useState("");
@@ -116,6 +127,61 @@ export default function App() {
       }
     }
   }
+
+  async function handleEdit(template) {
+
+  setEditorTemplate(template);
+  setEditorHtml("");
+  setEditorError("");
+  setEditorLoading(true);
+
+  try {
+
+    let html =
+      thumbnailHtml[template.path];
+
+    if (!html) {
+
+      const data =
+        await getFile(template.path);
+
+      const fileData =
+        data.data;
+
+      if (!fileData?.content) {
+        throw new Error(
+          "This file does not contain editable HTML."
+        );
+      }
+
+      html =
+        decodeBase64(
+          fileData.content
+        );
+    }
+
+    setEditorHtml(html);
+
+  } catch (error) {
+
+    setEditorError(
+      error.message
+    );
+
+  } finally {
+
+    setEditorLoading(false);
+
+  }
+}
+
+function closeEditor() {
+
+  setEditorTemplate(null);
+  setEditorHtml("");
+  setEditorError("");
+
+}
 
 
   async function handlePreview(template) {
@@ -261,11 +327,12 @@ export default function App() {
         )}
 
 
-        <Results
+     <Results
   results={results}
   query={query}
   loading={loading}
   onPreview={handlePreview}
+  onEdit={handleEdit}
   thumbnailHtml={thumbnailHtml}
 />
 
@@ -296,6 +363,28 @@ export default function App() {
         error={previewError}
         onClose={closePreview}
       />
+
+    {editorLoading && (
+  <div className="editor-loading">
+    Loading template...
+  </div>
+)}
+
+{editorError && (
+  <div className="editor-error">
+    {editorError}
+  </div>
+)}
+
+{editorTemplate &&
+  editorHtml &&
+  !editorLoading && (
+    <TemplateEditor
+      template={editorTemplate}
+      html={editorHtml}
+      onClose={closeEditor}
+    />
+)}
 
     </div>
   );

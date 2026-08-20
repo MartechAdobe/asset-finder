@@ -5,6 +5,7 @@ export default function Results({
   query,
   loading,
   onPreview,
+  onEdit,
   thumbnailHtml
 }) {
 
@@ -142,14 +143,15 @@ export default function Results({
 
         {results.map((template, index) => (
 
-          <TemplateCard
-            key={`${template.sha}-${index}`}
-            template={template}
-            onPreview={onPreview}
-            thumbnailHtml={
-              thumbnailHtml?.[template.path]
-            }
-          />
+         <TemplateCard
+  key={`${template.sha}-${index}`}
+  template={template}
+  onPreview={onPreview}
+  onEdit={onEdit}
+  thumbnailHtml={
+    thumbnailHtml?.[template.path]
+  }
+/>
 
         ))}
 
