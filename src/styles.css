@@ -162,6 +162,222 @@ main {
   line-height: 1.6;
 }
 
+/* =========================================================
+   MAIN NAVIGATION
+   ========================================================= */
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  padding: 4px;
+
+  border: 1px solid #2d2d2d;
+  border-radius: 9px;
+
+  background: #171717;
+}
+
+.nav-item {
+  padding: 8px 14px;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #777;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.nav-item:hover {
+  color: #ddd;
+}
+
+.nav-item.active {
+  background: #292929;
+  color: #fff;
+}
+
+/* =========================================================
+   IMAGE EDITOR PAGE
+   ========================================================= */
+
+.image-editor-page {
+  min-height: calc(100vh - 76px);
+
+  padding: 70px 0 100px;
+}
+
+.image-editor-header {
+  margin-bottom: 40px;
+}
+
+.image-editor-header h2 {
+  margin: 0;
+
+  font-size: clamp(34px, 5vw, 54px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.image-editor-header p:last-child {
+  max-width: 620px;
+
+  margin-top: 18px;
+
+  color: #888;
+
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+
+/* Upload */
+
+.image-upload-zone {
+  min-height: 360px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px dashed #444;
+  border-radius: 14px;
+
+  background: #171717;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.image-upload-zone:hover {
+  border-color: #777;
+  background: #1c1c1c;
+}
+
+.upload-plus {
+  width: 52px;
+  height: 52px;
+
+  margin-bottom: 18px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #444;
+  border-radius: 50%;
+
+  color: #ddd;
+
+  font-size: 30px;
+}
+
+.image-upload-zone h3 {
+  margin: 0 0 8px;
+
+  color: #eee;
+
+  font-size: 18px;
+}
+
+.image-upload-zone p {
+  margin: 0 0 20px;
+
+  color: #666;
+
+  font-size: 12px;
+}
+
+.image-upload-button,
+.image-change-button {
+  padding: 9px 15px;
+
+  border: 1px solid #444;
+  border-radius: 7px;
+
+  background: #242424;
+  color: #eee;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.image-upload-button:hover,
+.image-change-button:hover {
+  background: #303030;
+}
+
+
+/* Preview */
+
+/* .image-editor-preview {
+  min-height: 500px;
+
+  overflow: hidden;
+
+  border: 1px solid #2d2d2d;
+  border-radius: 14px;
+
+  background: #171717;
+} */
+
+.image-toolbar {
+  min-height: 56px;
+
+  padding: 0 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid #2d2d2d;
+
+  background: #191919;
+
+  color: #bbb;
+
+  font-size: 12px;
+}
+
+/* .image-editor-canvas {
+  min-height: 600px;
+
+  padding: 40px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  overflow: auto;
+
+  background: #292929;
+} */
+
+.image-editor-canvas img {
+  display: block;
+
+  max-width: min(900px, 100%);
+
+  height: auto;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
 /* SEARCH */
 
 .search-form {
@@ -1333,6 +1549,1367 @@ footer a:hover {
 
 
 /* =========================================================
+   IMAGE OCR EDITOR
+   ========================================================= */
+
+.image-editor-error {
+  margin-bottom: 20px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #593535;
+  border-radius: 7px;
+
+  background: #241717;
+  color: #e58c8c;
+
+  font-size: 12px;
+}
+
+
+.image-processing {
+  min-height: 420px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+}
+
+
+.processing-title {
+  color: #ddd;
+
+  font-size: 14px;
+}
+
+
+.processing-bar {
+  width: 320px;
+  height: 5px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: #303030;
+}
+
+
+.processing-bar div {
+  height: 100%;
+
+  background: #eee;
+
+  transition: width 0.2s ease;
+}
+
+
+.processing-percentage {
+  color: #777;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   IMAGE OCR EDITOR — RESPONSIVE IMAGE/CANVAS
+   ========================================================= */
+
+.image-editor-error {
+  margin-bottom: 20px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #593535;
+  border-radius: 7px;
+
+  background: #241717;
+  color: #e58c8c;
+
+  font-size: 12px;
+}
+
+.image-processing {
+  min-height: 420px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+}
+
+.processing-title {
+  color: #ddd;
+  font-size: 14px;
+}
+
+.processing-bar {
+  width: 320px;
+  height: 5px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: #303030;
+}
+
+.processing-bar div {
+  height: 100%;
+
+  background: #eee;
+
+  transition: width 0.2s ease;
+}
+
+.processing-percentage {
+  color: #777;
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   WORKSPACE
+   ========================================================= */
+
+.image-editor-workspace {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    300px;
+
+  width: 100%;
+  min-width: 0;
+
+  align-items: start;
+
+  border: 1px solid #2d2d2d;
+  border-radius: 14px;
+
+  overflow: visible;
+
+  background: #171717;
+}
+
+
+/* =========================================================
+   PREVIEW
+   ========================================================= */
+
+.image-editor-preview {
+  min-width: 0;
+  width: 100%;
+
+  overflow: visible;
+
+  border-radius: 13px 0 0 13px;
+}
+
+
+.image-toolbar {
+  min-width: 0;
+  min-height: 56px;
+
+  padding: 0 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  border-bottom: 1px solid #2d2d2d;
+
+  background: #191919;
+
+  color: #bbb;
+
+  font-size: 12px;
+}
+
+
+.image-toolbar > div:first-child {
+  min-width: 0;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.image-toolbar strong {
+  display: block;
+
+  min-width: 0;
+  max-width: 100%;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.image-toolbar span {
+  flex: 0 0 auto;
+  color: #666;
+}
+
+
+.image-toolbar-actions {
+  display: flex;
+  align-items: center;
+
+  flex: 0 0 auto;
+
+  gap: 8px;
+}
+
+
+/* =========================================================
+   IMAGE CANVAS AREA
+   ========================================================= */
+
+.image-editor-canvas {
+  width: 100%;
+  min-width: 0;
+
+  padding: 36px;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  overflow: visible;
+
+  background: #292929;
+
+  border-radius: 0 0 0 13px;
+}
+
+
+/*
+ * IMPORTANT:
+ *
+ * The stage has no fixed height and no forced aspect-ratio.
+ * Its width follows the available preview column.
+ */
+.image-stage {
+  position: relative;
+
+  width: 100%;
+  max-width: 100%;
+
+  height: auto;
+  min-height: 0;
+
+  margin: 0;
+
+  overflow: visible;
+
+  line-height: 0;
+
+  flex: 0 1 auto;
+}
+
+
+/*
+ * IMPORTANT:
+ *
+ * There must be only ONE .image-main rule.
+ *
+ * width: 100% keeps the complete image visible.
+ * height: auto preserves the original aspect ratio.
+ *
+ * The canvas internal resolution remains the original
+ * image resolution, so downloads are still full quality.
+ */
+.image-main {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  max-width: 100%;
+  min-width: 0;
+
+  margin: 0;
+
+  object-fit: contain;
+
+  vertical-align: top;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================================================
+   OCR BOXES
+   ========================================================= */
+
+.ocr-box {
+  position: absolute;
+
+  box-sizing: border-box;
+
+  border: 1px dashed rgba(255, 255, 255, 0.7);
+
+  background: rgba(255, 255, 255, 0.03);
+
+  cursor: pointer;
+
+  pointer-events: auto;
+
+  z-index: 10;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+
+.ocr-box:hover {
+  border-color: #fff;
+
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+
+.ocr-box.selected {
+  border: 2px solid #fff;
+
+  background:
+    rgba(255, 255, 255, 0.08);
+
+  z-index: 20;
+}
+
+
+.ocr-box span {
+  display: none;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+
+.image-sidebar {
+  min-width: 0;
+  min-height: 0;
+
+  display: grid;
+
+  grid-template-rows:
+    56px
+    minmax(0, 1fr);
+
+  overflow: hidden;
+
+  border-left: 1px solid #2d2d2d;
+
+  background: #151515;
+}
+
+
+.image-sidebar-header {
+  padding: 0 16px;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid #2d2d2d;
+}
+
+
+.image-sidebar-header > div {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.image-sidebar-header span {
+  color: #888;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+}
+
+
+.image-sidebar-header strong {
+  min-width: 22px;
+  height: 20px;
+
+  padding: 0 6px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 4px;
+
+  background: #292929;
+
+  color: #aaa;
+
+  font-size: 9px;
+}
+
+
+.detected-text-list {
+  min-height: 0;
+
+  padding: 16px;
+
+  overflow-y: auto;
+}
+
+
+.detected-text-item {
+  margin-bottom: 18px;
+}
+
+
+.detected-text-item label {
+  margin-bottom: 7px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: #888;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+
+.detected-text-item label span:last-child {
+  color: #666;
+}
+
+
+.detected-text-item textarea {
+  display: block;
+
+  width: 100%;
+  min-height: 50px;
+
+  box-sizing: border-box;
+
+  padding: 10px;
+
+  resize: vertical;
+
+  border: 1px solid #333;
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #0f0f0f;
+  color: #eee;
+
+  font-family: inherit;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+.detected-text-item textarea:focus {
+  border-color: #666;
+}
+
+
+.ocr-position {
+  margin-top: 5px;
+
+  color: #555;
+
+  font-family: monospace;
+
+  font-size: 9px;
+}
+
+
+.no-text {
+  padding: 30px 10px;
+
+  text-align: center;
+
+  color: #666;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   TEXT EDIT PANEL
+   ========================================================= */
+
+.text-edit-panel {
+  padding: 16px;
+
+  border-bottom: 1px solid #2d2d2d;
+
+  background: #191919;
+}
+
+
+.text-edit-label {
+  margin-bottom: 16px;
+
+  color: #888;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+}
+
+
+.text-edit-original {
+  margin-bottom: 16px;
+}
+
+
+.text-edit-original span,
+.text-edit-input label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #666;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+}
+
+
+.text-edit-original p {
+  margin: 0;
+
+  color: #bbb;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+.text-edit-input textarea {
+  width: 100%;
+  min-height: 70px;
+
+  box-sizing: border-box;
+
+  padding: 10px;
+
+  resize: vertical;
+
+  border: 1px solid #383838;
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #0f0f0f;
+  color: #fff;
+
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+.text-edit-input textarea:focus {
+  border-color: #666;
+}
+
+
+.apply-text-button {
+  width: 100%;
+
+  margin-top: 12px;
+
+  padding: 10px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: #eee;
+  color: #111;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.apply-text-button:hover {
+  background: #fff;
+}
+
+.image-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.download-image-button {
+  border: 1px solid #444;
+  border-radius: 7px;
+
+  padding: 9px 14px;
+
+  background: #fff;
+  color: #111;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.download-image-button:hover {
+  background: #e8e8e8;
+}
+
+/* =========================================================
+   GITHUB UPLOAD PAGE
+========================================================= */
+
+.github-upload-page {
+  width: min(1000px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 64px 0 100px;
+}
+
+
+/* ---------------------------------------------------------
+   HEADER
+--------------------------------------------------------- */
+
+.github-upload-heading {
+  margin-bottom: 32px;
+}
+
+.github-upload-heading .eyebrow {
+  margin-bottom: 14px;
+}
+
+.github-upload-heading h2 {
+  margin: 0;
+
+  font-size: 42px;
+  line-height: 1.05;
+
+  letter-spacing: -0.035em;
+}
+
+.github-upload-heading p:last-child {
+  margin-top: 14px;
+
+  max-width: 650px;
+
+  color: #888;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* ---------------------------------------------------------
+   DROP ZONE
+--------------------------------------------------------- */
+
+.github-dropzone {
+  min-height: 250px;
+
+  padding: 40px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px dashed #444;
+  border-radius: 14px;
+
+  background: #171717;
+
+  text-align: center;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.github-dropzone:hover {
+  border-color: #666;
+}
+
+.github-dropzone.dragging {
+  border-color: #999;
+
+  background: #202020;
+
+  transform: scale(1.005);
+}
+
+
+/* PLUS ICON */
+
+.github-drop-icon {
+  width: 52px;
+  height: 52px;
+
+  margin-bottom: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #3a3a3a;
+  border-radius: 50%;
+
+  background: #202020;
+
+  color: #fff;
+
+  font-size: 26px;
+  font-weight: 300;
+}
+
+.github-dropzone h3 {
+  margin: 0 0 8px;
+
+  color: #fff;
+
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.github-dropzone p {
+  margin: 0 0 22px;
+
+  color: #777;
+
+  font-size: 12px;
+}
+
+
+/* CHOOSE FILE */
+
+.github-browse-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 110px;
+
+  padding: 9px 15px;
+
+  border: 1px solid #444;
+  border-radius: 7px;
+
+  background: #242424;
+
+  color: #eee;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.github-browse-button:hover {
+  background: #2d2d2d;
+  border-color: #555;
+}
+
+
+/* ---------------------------------------------------------
+   SELECTED FILE
+--------------------------------------------------------- */
+
+.github-selected-file {
+  margin-top: 14px;
+
+  padding: 15px 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border: 1px solid #2d2d2d;
+  border-radius: 9px;
+
+  background: #171717;
+}
+
+.github-selected-file > div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.github-selected-file span {
+  color: #666;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+.github-selected-file strong {
+  color: #ddd;
+
+  font-size: 12px;
+}
+
+.github-selected-file small {
+  color: #666;
+
+  font-size: 10px;
+}
+
+.github-selected-file button {
+  padding: 6px 10px;
+
+  border: 1px solid #333;
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: #999;
+
+  font-size: 10px;
+
+  cursor: pointer;
+}
+
+.github-selected-file button:hover {
+  color: #fff;
+  border-color: #555;
+}
+
+
+/* ---------------------------------------------------------
+   DESTINATION
+--------------------------------------------------------- */
+
+.github-destination {
+  margin-top: 26px;
+
+  overflow: hidden;
+
+  border: 1px solid #2d2d2d;
+  border-radius: 12px;
+
+  background: #171717;
+}
+
+
+/* SECTION TITLE */
+
+.github-section-title {
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #2d2d2d;
+}
+
+.github-section-title h3 {
+  margin: 0 0 5px;
+
+  color: #eee;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.github-section-title span {
+  color: #666;
+
+  font-size: 10px;
+}
+
+
+/* ---------------------------------------------------------
+   BREADCRUMBS
+--------------------------------------------------------- */
+
+.github-breadcrumb {
+  min-height: 46px;
+
+  padding: 10px 18px;
+
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  border-bottom: 1px solid #292929;
+
+  background: #151515;
+}
+
+.github-breadcrumb button {
+  padding: 4px 5px;
+
+  border: 0;
+  border-radius: 4px;
+
+  background: transparent;
+
+  color: #777;
+
+  font-size: 11px;
+
+  cursor: pointer;
+}
+
+.github-breadcrumb button:hover {
+  color: #fff;
+  background: #222;
+}
+
+.github-breadcrumb button.active {
+  color: #fff;
+}
+
+.github-breadcrumb-item {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+.github-breadcrumb-item > span {
+  color: #444;
+}
+
+
+/* ---------------------------------------------------------
+   FOLDER BROWSER
+--------------------------------------------------------- */
+
+.github-folder-browser {
+  padding: 18px;
+}
+
+
+/* BACK BUTTON */
+
+.github-back-button {
+  margin-bottom: 14px;
+
+  padding: 7px 11px;
+
+  border: 1px solid #333;
+  border-radius: 6px;
+
+  background: #202020;
+
+  color: #aaa;
+
+  font-size: 10px;
+
+  cursor: pointer;
+}
+
+.github-back-button:hover {
+  background: #282828;
+  color: #fff;
+}
+
+
+/* FOLDER GRID */
+
+.github-folder-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(220px, 1fr)
+    );
+
+  gap: 8px;
+}
+
+
+/* FOLDER */
+
+.github-folder {
+  width: 100%;
+
+  min-height: 62px;
+
+  padding: 12px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+
+  background: #191919;
+
+  color: #aaa;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.github-folder:hover {
+  background: #222;
+
+  border-color: #444;
+
+  color: #fff;
+}
+
+.github-folder.selected {
+  background: #242424;
+
+  border-color: #666;
+
+  color: #fff;
+}
+
+
+/* FOLDER ICON */
+
+.github-folder-icon {
+  width: 30px;
+  height: 30px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  background: #222;
+
+  font-size: 15px;
+}
+
+
+/* FOLDER NAME */
+
+.github-folder-name {
+  flex: 1;
+
+  overflow: hidden;
+
+  color: inherit;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ARROW */
+
+.github-folder-arrow {
+  color: #555;
+
+  font-size: 14px;
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.github-folder:hover .github-folder-arrow {
+  color: #aaa;
+
+  transform: translateX(2px);
+}
+
+
+/* ---------------------------------------------------------
+   LOADING / ERROR
+--------------------------------------------------------- */
+
+.github-folder-status {
+  min-height: 150px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #666;
+
+  font-size: 11px;
+}
+
+.github-folder-error {
+  padding: 18px;
+
+  border: 1px solid #492929;
+  border-radius: 8px;
+
+  background: #241717;
+
+  color: #d88;
+
+  font-size: 11px;
+}
+
+
+/* ---------------------------------------------------------
+   EXISTING FILES
+--------------------------------------------------------- */
+
+.github-existing-files {
+  margin-top: 24px;
+
+  padding-top: 18px;
+
+  border-top: 1px solid #292929;
+}
+
+.github-existing-files h4 {
+  margin: 0 0 10px;
+
+  color: #666;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+.github-existing-file {
+  padding: 9px 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  border-bottom: 1px solid #222;
+
+  color: #888;
+
+  font-size: 11px;
+}
+
+.github-existing-file:last-child {
+  border-bottom: 0;
+}
+
+
+/* ---------------------------------------------------------
+   COMMIT MESSAGE
+--------------------------------------------------------- */
+
+.github-commit-section {
+  margin-top: 22px;
+}
+
+.github-commit-section label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #666;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+.github-commit-section input {
+  width: 100%;
+  height: 44px;
+
+  padding: 0 12px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #333;
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #171717;
+
+  color: #eee;
+
+  font-family: inherit;
+
+  font-size: 11px;
+}
+
+.github-commit-section input::placeholder {
+  color: #555;
+}
+
+.github-commit-section input:focus {
+  border-color: #666;
+}
+
+
+/* ---------------------------------------------------------
+   SELECTED DESTINATION
+--------------------------------------------------------- */
+
+.github-selected-path {
+  margin-top: 12px;
+
+  padding: 13px 15px;
+
+  border: 1px solid #292929;
+  border-radius: 8px;
+
+  background: #151515;
+}
+
+.github-selected-path span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #666;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+.github-selected-path strong {
+  display: block;
+
+  color: #aaa;
+
+  font-family: monospace;
+
+  font-size: 11px;
+
+  font-weight: 400;
+
+  word-break: break-all;
+}
+
+
+/* ---------------------------------------------------------
+   UPLOAD BUTTON
+--------------------------------------------------------- */
+
+.github-upload-button {
+  width: 100%;
+
+  height: 48px;
+
+  margin-top: 14px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: #fff;
+
+  color: #111;
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.github-upload-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.github-upload-button:disabled {
+  opacity: 0.3;
+
+  cursor: not-allowed;
+}
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+  .github-upload-page {
+    width: min(
+      100% - 28px,
+      1000px
+    );
+
+    padding-top: 40px;
+  }
+
+  .github-upload-heading h2 {
+    font-size: 34px;
+  }
+
+  .github-dropzone {
+    padding: 30px 20px;
+  }
+
+  .github-folder-list {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+/* =========================================================
    RESPONSIVE
    ========================================================= */
 
@@ -1368,7 +2945,30 @@ footer a:hover {
 
 /* RESPONSIVE */
 
+@media (max-width: 900px) {
+
+  .image-editor-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .image-editor-preview {
+    border-radius: 13px 13px 0 0;
+  }
+
+  .image-editor-canvas {
+    padding: 24px;
+    border-radius: 0;
+  }
+
+  .image-sidebar {
+    border-left: 0;
+    border-top: 1px solid #2d2d2d;
+  }
+}
+
+
 @media (max-width: 800px) {
+
 
   .header {
     padding: 0 20px;
