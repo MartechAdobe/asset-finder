@@ -1,16 +1,27 @@
 const API_URL =
   "https://adobe-github-api.akshanshdogra.workers.dev";
 
+/**
+ * Common API request helper
+ */
 async function apiRequest(url, options = {}) {
-  const response = await fetch(url, options);
+  let response;
+
+  try {
+    response = await fetch(url, options);
+  } catch (error) {
+    throw new Error(
+      "Unable to connect to the GitHub API Worker."
+    );
+  }
 
   let data;
 
   try {
     data = await response.json();
-  } catch {
+  } catch (error) {
     throw new Error(
-      `Worker returned an invalid response (${response.status})`
+      `Worker returned an invalid response (${response.status}).`
     );
   }
 
@@ -26,9 +37,9 @@ async function apiRequest(url, options = {}) {
 }
 
 
-// ------------------------------------
-// SEARCH
-// ------------------------------------
+/* =========================================================
+   REPOSITORY SEARCH
+   ========================================================= */
 
 export async function searchRepository(query) {
   return apiRequest(
@@ -37,9 +48,9 @@ export async function searchRepository(query) {
 }
 
 
-// ------------------------------------
-// GET FILE
-// ------------------------------------
+/* =========================================================
+   GET FILE
+   ========================================================= */
 
 export async function getFile(path) {
   return apiRequest(
@@ -48,97 +59,161 @@ export async function getFile(path) {
 }
 
 
-// ------------------------------------
-// REPOSITORY INFO
-// ------------------------------------
+/* =========================================================
+   GET RAW FILE
+   ========================================================= */
+
+export async function getRawFile(path) {
+  return apiRequest(
+    `${API_URL}/raw?path=${encodeURIComponent(path)}`
+  );
+}
+
+
+/* =========================================================
+   GET REPOSITORY
+   ========================================================= */
 
 export async function getRepository() {
-  return apiRequest(`${API_URL}/repo`);
+  return apiRequest(
+    `${API_URL}/repo`
+  );
 }
 
 
-// ------------------------------------
-// GET FOLDERS
-// ------------------------------------
+/* =========================================================
+   GET FOLDERS
+   =========================================================
+   
+   Example:
+
+   getFolders()
+
+   -> Root folders
+
+   getFolders("ACS summit")
+
+   -> Folders/files inside ACS summit
+
+   getFolders("ACS summit/Asset Finder Test")
+
+   -> Folders/files inside nested folder
+   ========================================================= */
 
 export async function getFolders(path = "") {
-  const url =
-    path.trim().length > 0
-      ? `${API_URL}/folders?path=${encodeURIComponent(path)}`
-      : `${API_URL}/folders`;
-
-  return apiRequest(url);
+  return apiRequest(
+    `${API_URL}/folders?path=${encodeURIComponent(path)}`
+  );
 }
 
 
-// ------------------------------------
-// CREATE FOLDER
-// ------------------------------------
+/* =========================================================
+   CREATE FOLDER
+   =========================================================
+
+   Example:
+
+   await createFolder({
+     path: "ACS summit/New Folder",
+     message: "Create new folder"
+   });
+
+   ========================================================= */
 
 export async function createFolder({
   path,
-  message = "Create new folder"
+  message = "Create folder"
 }) {
-  return apiRequest(`${API_URL}/create-folder`, {
-    method: "POST",
+  if (!path || !path.trim()) {
+    throw new Error(
+      "Folder path is required."
+    );
+  }
 
-    headers: {
-      "Content-Type": "application/json"
-    },
+  return apiRequest(
+    `${API_URL}/create-folder`,
+    {
+      method: "POST",
 
-    body: JSON.stringify({
-      path,
-      message
-    })
-  });
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        path: path.trim(),
+        message
+      })
+    }
+  );
 }
 
 
-// ------------------------------------
-// UPLOAD FILE
-// ------------------------------------
+/* =========================================================
+   UPLOAD FILE
+   =========================================================
+
+   IMPORTANT:
+
+   The Worker expects:
+
+   contentBase64
+
+   NOT:
+
+   content
+
+   Example:
+
+   await uploadFile({
+     path: "ACS summit/Test/Template.html",
+     content: base64Content,
+     message: "Upload template"
+   });
+
+   ========================================================= */
 
 export async function uploadFile({
   path,
   content,
   message = "Upload asset"
 }) {
-  return apiRequest(`${API_URL}/upload`, {
-    method: "POST",
+  if (!path || !path.trim()) {
+    throw new Error(
+      "File path is required."
+    );
+  }
 
-    headers: {
-      "Content-Type": "application/json"
-    },
+  if (!content) {
+    throw new Error(
+      "File content is required."
+    );
+  }
 
-    body: JSON.stringify({
-      path,
-      content,
-      message
-    })
-  });
+  return apiRequest(
+    `${API_URL}/upload`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        path: path.trim(),
+
+        // IMPORTANT:
+        // Worker expects contentBase64
+        contentBase64: content,
+
+        message
+      })
+    }
+  );
 }
 
 
-// ------------------------------------
-// UPDATE FILE
-// ------------------------------------
+/* =========================================================
+   EXPORT API URL
+   ========================================================= */
 
-export async function updateFile({
-  path,
-  content,
-  message = "Update asset"
-}) {
-  return apiRequest(`${API_URL}/file`, {
-    method: "PUT",
-
-    headers: {
-      "Content-Type": "application/json"
-    },
-
-    body: JSON.stringify({
-      path,
-      content,
-      message
-    })
-  });
-}
+export { API_URL };
