@@ -6,9 +6,7 @@ import {
   uploadFile,
 } from "../services/githubApi";
 
-
 export default function GitHubUpload() {
-
   // =========================================================
   // GITHUB FOLDER STATE
   // =========================================================
@@ -25,6 +23,9 @@ export default function GitHubUpload() {
   const [error, setError] =
     useState("");
 
+  // Folder search
+  const [folderSearch, setFolderSearch] =
+    useState("");
 
   // =========================================================
   // FILE STATE
@@ -36,14 +37,12 @@ export default function GitHubUpload() {
   const [dragging, setDragging] =
     useState(false);
 
-
   // =========================================================
   // COMMIT STATE
   // =========================================================
 
   const [commitMessage, setCommitMessage] =
     useState("");
-
 
   // =========================================================
   // UPLOAD STATE
@@ -58,7 +57,6 @@ export default function GitHubUpload() {
   const [uploadError, setUploadError] =
     useState("");
 
-
   // =========================================================
   // CREATE FOLDER STATE
   // =========================================================
@@ -72,37 +70,34 @@ export default function GitHubUpload() {
   const [creatingFolder, setCreatingFolder] =
     useState(false);
 
-
   // =========================================================
   // LOAD GITHUB FOLDER
   // =========================================================
 
   async function loadFolder(path = "") {
-
     try {
-
       setLoading(true);
-
       setError("");
 
       const data =
         await getFolders(path);
 
-
       setFolders(
-        data.folders || []
+        Array.isArray(data?.folders)
+          ? data.folders
+          : []
       );
 
       setFiles(
-        data.files || []
+        Array.isArray(data?.files)
+          ? data.files
+          : []
       );
 
       setCurrentPath(
-        data.current_path || path
+        data?.current_path || path
       );
-
     } catch (err) {
-
       console.error(
         "Folder loading error:",
         err
@@ -110,132 +105,100 @@ export default function GitHubUpload() {
 
       setError(
         err.message ||
-        "Unable to load GitHub folder."
+          "Unable to load GitHub folder."
       );
-
     } finally {
-
       setLoading(false);
-
     }
   }
-
 
   // =========================================================
   // INITIAL LOAD
   // =========================================================
 
   useEffect(() => {
-
     loadFolder("");
-
   }, []);
-
 
   // =========================================================
   // OPEN FOLDER
   // =========================================================
 
   function openFolder(path) {
+    setFolderSearch("");
 
     setUploadSuccess("");
     setUploadError("");
 
     loadFolder(path);
-
   }
-
 
   // =========================================================
   // BACK
   // =========================================================
 
   function goBack() {
-
     if (!currentPath) {
       return;
     }
 
+    setFolderSearch("");
 
     const parts =
       currentPath
         .split("/")
         .filter(Boolean);
 
-
     parts.pop();
-
 
     const parentPath =
       parts.join("/");
 
-
-    loadFolder(
-      parentPath
-    );
-
+    loadFolder(parentPath);
   }
-
 
   // =========================================================
   // FILE SELECT
   // =========================================================
 
   function selectFile(file) {
-
     if (!file) {
       return;
     }
 
-
-    setSelectedFile(
-      file
-    );
+    setSelectedFile(file);
 
     setUploadSuccess("");
     setUploadError("");
-
   }
-
 
   // =========================================================
   // FILE INPUT
   // =========================================================
 
   function handleFileInput(event) {
-
     const file =
       event.target.files?.[0];
 
     selectFile(file);
 
     event.target.value = "";
-
   }
-
 
   // =========================================================
   // DRAG / DROP
   // =========================================================
 
   function handleDragOver(event) {
-
     event.preventDefault();
-
     setDragging(true);
-
   }
-
 
   function handleDragLeave() {
-
     setDragging(false);
-
   }
 
-
   function handleDrop(event) {
-
     event.preventDefault();
 
     setDragging(false);
@@ -244,9 +207,7 @@ export default function GitHubUpload() {
       event.dataTransfer.files?.[0];
 
     selectFile(file);
-
   }
-
 
   // =========================================================
   // BREADCRUMBS
@@ -254,7 +215,6 @@ export default function GitHubUpload() {
 
   const breadcrumbs =
     useMemo(() => {
-
       if (!currentPath) {
         return [];
       }
@@ -262,11 +222,10 @@ export default function GitHubUpload() {
       return currentPath
         .split("/")
         .filter(Boolean);
-
     }, [currentPath]);
 
-
   function openBreadcrumb(index) {
+    setFolderSearch("");
 
     const path =
       breadcrumbs
@@ -276,36 +235,74 @@ export default function GitHubUpload() {
         )
         .join("/");
 
-
     loadFolder(path);
-
   }
 
+  function goToRoot() {
+    setFolderSearch("");
+
+    setUploadSuccess("");
+    setUploadError("");
+
+    loadFolder("");
+  }
+
+  // =========================================================
+  // FILTER CURRENT FOLDER LIST
+  // =========================================================
+
+  const filteredFolders =
+    useMemo(() => {
+      const search =
+        folderSearch
+          .trim()
+          .toLowerCase();
+
+      if (!search) {
+        return folders;
+      }
+
+      return folders.filter(
+        (folder) => {
+          const name =
+            String(
+              folder?.name || ""
+            ).toLowerCase();
+
+          const path =
+            String(
+              folder?.path || ""
+            ).toLowerCase();
+
+          return (
+            name.includes(search) ||
+            path.includes(search)
+          );
+        }
+      );
+    }, [
+      folders,
+      folderSearch,
+    ]);
 
   // =========================================================
   // FILE -> BASE64
   // =========================================================
 
   function fileToBase64(file) {
-
     return new Promise(
       (resolve, reject) => {
-
         const reader =
           new FileReader();
 
-
         reader.onload = () => {
-
           const result =
             reader.result;
-
 
           if (
             typeof result !==
             "string"
           ) {
-
             reject(
               new Error(
                 "Unable to read selected file."
@@ -315,18 +312,8 @@ export default function GitHubUpload() {
             return;
           }
 
-
-          /*
-           * FileReader gives:
-           *
-           * data:image/png;base64,XXXXX
-           *
-           * We only send XXXXX to the Worker.
-           */
-
           const commaIndex =
             result.indexOf(",");
-
 
           const base64 =
             commaIndex >= 0
@@ -335,125 +322,83 @@ export default function GitHubUpload() {
                 )
               : result;
 
-
-          resolve(
-            base64
-          );
-
+          resolve(base64);
         };
 
-
         reader.onerror = () => {
-
           reject(
             new Error(
               "Unable to read selected file."
             )
           );
-
         };
 
-
-        reader.readAsDataURL(
-          file
-        );
-
+        reader.readAsDataURL(file);
       }
     );
-
   }
-
 
   // =========================================================
   // CREATE FOLDER
   // =========================================================
 
   async function handleCreateFolder() {
-
     const folderName =
       newFolderName.trim();
 
-
     if (!folderName) {
-
       return;
-
     }
-
-
-    /*
-     * Prevent folder names containing
-     * path separators.
-     */
 
     if (
       folderName.includes("/") ||
       folderName.includes("\\")
     ) {
-
       setUploadError(
         "Folder name cannot contain / or \\."
       );
 
       return;
-
     }
 
-
     try {
-
       setCreatingFolder(true);
 
       setUploadSuccess("");
       setUploadError("");
-
 
       const folderPath =
         currentPath
           ? `${currentPath}/${folderName}`
           : folderName;
 
-
       const result =
         await createFolder({
-
-          path:
-            folderPath,
-
+          path: folderPath,
           message:
-            `Create folder ${folderName}`
-
+            `Create folder ${folderName}`,
         });
-
 
       console.log(
         "CREATE FOLDER RESPONSE:",
         result
       );
 
-
       setUploadSuccess(
         result.message ||
-        `Folder "${folderName}" created successfully.`
+          `Folder "${folderName}" created successfully.`
       );
-
 
       setNewFolderName("");
 
       setShowCreateFolder(false);
 
-
-      /*
-       * Refresh the current location.
-       */
+      setFolderSearch("");
 
       await loadFolder(
         currentPath
       );
-
-
     } catch (err) {
-
       console.error(
         "Create folder failed:",
         err
@@ -461,127 +406,79 @@ export default function GitHubUpload() {
 
       setUploadError(
         err.message ||
-        "Unable to create folder."
+          "Unable to create folder."
       );
-
     } finally {
-
       setCreatingFolder(false);
-
     }
-
   }
-
 
   // =========================================================
   // UPLOAD FILE
   // =========================================================
 
   async function handleUpload() {
-
     setUploadSuccess("");
     setUploadError("");
 
-
     if (!selectedFile) {
-
       setUploadError(
         "Please choose a file first."
       );
 
       return;
-
     }
 
-
     if (!currentPath) {
-
       setUploadError(
         "Please select a destination folder."
       );
 
       return;
-
     }
 
-
     try {
-
       setUploading(true);
-
-
-      /*
-       * Convert the local file to base64.
-       */
 
       const base64 =
         await fileToBase64(
           selectedFile
         );
 
-
       const targetPath =
         `${currentPath}/${selectedFile.name}`;
-
 
       console.log(
         "Uploading:",
         targetPath
       );
 
-
       const result =
         await uploadFile({
-
-          path:
-            targetPath,
-
-          content:
-            base64,
-
+          path: targetPath,
+          content: base64,
           message:
             commitMessage.trim() ||
-            `Add ${selectedFile.name}`
-
+            `Add ${selectedFile.name}`,
         });
-
 
       console.log(
         "UPLOAD RESPONSE:",
         result
       );
 
-
       setUploadSuccess(
         result.message ||
-        "File uploaded successfully."
+          "File uploaded successfully."
       );
-
-
-      /*
-       * Refresh folder contents so the
-       * uploaded file appears immediately.
-       */
 
       await loadFolder(
         currentPath
       );
 
-
-      /*
-       * Clear selected file after
-       * successful upload.
-       */
-
-      setSelectedFile(
-        null
-      );
-
-
+      setSelectedFile(null);
       setCommitMessage("");
-
     } catch (err) {
-
       console.error(
         "Upload failed:",
         err
@@ -589,126 +486,82 @@ export default function GitHubUpload() {
 
       setUploadError(
         err.message ||
-        "Unable to upload file."
+          "Unable to upload file."
       );
-
     } finally {
-
       setUploading(false);
-
     }
-
   }
-
 
   // =========================================================
   // RENDER
   // =========================================================
 
   return (
-
     <section className="github-upload-page">
 
-
-      {/* =====================================================
-          HEADER
-      ====================================================== */}
-
+      {/* PAGE HEADER */}
       <div className="github-upload-heading">
-
         <p className="eyebrow">
           GITHUB ASSET UPLOAD
         </p>
-
 
         <h2>
           Upload directly to Adobe.
         </h2>
 
-
         <p>
           Choose any folder in the Adobe
           repository, including nested folders.
         </p>
-
       </div>
 
-
-      {/* =====================================================
-          DROP ZONE
-      ====================================================== */}
-
+      {/* DROP ZONE */}
       <div
         className={
           dragging
             ? "github-dropzone dragging"
             : "github-dropzone"
         }
-
-        onDragOver={
-          handleDragOver
-        }
-
-        onDragLeave={
-          handleDragLeave
-        }
-
-        onDrop={
-          handleDrop
-        }
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       >
-
         <div className="github-drop-icon">
           +
         </div>
-
 
         <h3>
           Drop your asset here
         </h3>
 
-
         <p>
           PNG, JPG, HTML, newsletter or other files
         </p>
 
-
         <label className="github-browse-button">
-
           Choose file
 
           <input
             type="file"
             hidden
-            onChange={
-              handleFileInput
-            }
+            onChange={handleFileInput}
           />
-
         </label>
-
       </div>
 
-
-      {/* =====================================================
-          SELECTED FILE
-      ====================================================== */}
-
+      {/* SELECTED FILE */}
       {selectedFile && (
-
         <div className="github-selected-file">
 
           <div>
-
             <span>
               Selected file
             </span>
 
-
             <strong>
               {selectedFile.name}
             </strong>
-
 
             <small>
               {(
@@ -716,39 +569,27 @@ export default function GitHubUpload() {
               ).toFixed(1)}
               {" KB"}
             </small>
-
           </div>
-
 
           <button
             type="button"
             onClick={() =>
-              setSelectedFile(
-                null
-              )
+              setSelectedFile(null)
             }
           >
             Remove
           </button>
 
         </div>
-
       )}
 
-
-      {/* =====================================================
-          DESTINATION
-      ====================================================== */}
-
+      {/* DESTINATION */}
       <div className="github-destination">
 
-
         {/* SECTION HEADER */}
-
         <div className="github-section-title-row">
 
           <div>
-
             <h3>
               Upload destination
             </h3>
@@ -756,93 +597,62 @@ export default function GitHubUpload() {
             <span>
               MartechAdobe / Adobe
             </span>
-
           </div>
-
 
           <button
             type="button"
             className="github-new-folder-button"
-
             onClick={() => {
-
-              setShowCreateFolder(
-                true
-              );
-
+              setShowCreateFolder(true);
               setUploadError("");
               setUploadSuccess("");
-
             }}
           >
-            + New folder
+            <span>+</span>
+            New folder
           </button>
 
         </div>
 
-
-        {/* ===================================================
-            CREATE FOLDER FORM
-        ================================================== */}
-
+        {/* CREATE FOLDER */}
         {showCreateFolder && (
-
           <div className="github-new-folder">
 
             <div className="github-new-folder-title">
-
               Create new folder
-
             </div>
 
-
             <div className="github-new-folder-current">
-
               Parent:
-
               {" "}
-
               <strong>
                 Adobe/
                 {currentPath
                   ? `${currentPath}/`
                   : ""}
               </strong>
-
             </div>
-
 
             <div className="github-new-folder-row">
 
               <input
                 type="text"
-                value={
-                  newFolderName
-                }
-
+                value={newFolderName}
                 onChange={(event) =>
                   setNewFolderName(
                     event.target.value
                   )
                 }
-
                 placeholder="Folder name"
-
                 autoFocus
-
-                disabled={
-                  creatingFolder
-                }
+                disabled={creatingFolder}
               />
-
 
               <button
                 type="button"
-
                 onClick={
                   handleCreateFolder
                 }
-
                 disabled={
                   creatingFolder ||
                   !newFolderName.trim()
@@ -853,12 +663,9 @@ export default function GitHubUpload() {
                   : "Create"}
               </button>
 
-
               <button
                 type="button"
-
                 onClick={() => {
-
                   setShowCreateFolder(
                     false
                   );
@@ -866,12 +673,8 @@ export default function GitHubUpload() {
                   setNewFolderName("");
 
                   setUploadError("");
-
                 }}
-
-                disabled={
-                  creatingFolder
-                }
+                disabled={creatingFolder}
               >
                 Cancel
               </button>
@@ -879,23 +682,90 @@ export default function GitHubUpload() {
             </div>
 
           </div>
-
         )}
 
+        {/* LOCATION */}
+        <div className="github-location-bar">
 
-        {/* ===================================================
-            BREADCRUMB
-        ================================================== */}
+          <div className="github-location-icon">
+            📁
+          </div>
 
+          <div className="github-location-content">
+            <span>
+              Current location
+            </span>
+
+            <strong>
+              {currentPath
+                ? `Adobe / ${currentPath}`
+                : "MartechAdobe / Adobe"}
+            </strong>
+          </div>
+
+          {currentPath && (
+            <button
+              type="button"
+              className="github-root-button"
+              onClick={goToRoot}
+            >
+              Root
+            </button>
+          )}
+
+        </div>
+
+        {/* FOLDER TOOLBAR */}
+        <div className="github-folder-toolbar">
+
+          <div className="github-folder-search">
+
+            <span className="github-folder-search-icon">
+              ⌕
+            </span>
+
+            <input
+              type="text"
+              value={folderSearch}
+              onChange={(event) =>
+                setFolderSearch(
+                  event.target.value
+                )
+              }
+              placeholder="Search folders..."
+              aria-label="Search folders"
+            />
+
+            {folderSearch && (
+              <button
+                type="button"
+                className="github-folder-search-clear"
+                onClick={() =>
+                  setFolderSearch("")
+                }
+                aria-label="Clear folder search"
+              >
+                ×
+              </button>
+            )}
+
+          </div>
+
+          <div className="github-folder-count">
+            {filteredFolders.length}{" "}
+            {filteredFolders.length === 1
+              ? "folder"
+              : "folders"}
+          </div>
+
+        </div>
+
+        {/* BREADCRUMB */}
         <div className="github-breadcrumb">
 
           <button
             type="button"
-
-            onClick={() =>
-              loadFolder("")
-            }
-
+            onClick={goToRoot}
             className={
               !currentPath
                 ? "active"
@@ -905,67 +775,58 @@ export default function GitHubUpload() {
             Adobe
           </button>
 
-
           {breadcrumbs.map(
             (part, index) => (
-
               <div
-                key={`${part}-${index}`}
                 className="github-breadcrumb-item"
+                key={`${part}-${index}`}
               >
 
                 <span>
                   /
                 </span>
 
-
                 <button
                   type="button"
-
                   onClick={() =>
-                    openBreadcrumb(
-                      index
-                    )
+                    openBreadcrumb(index)
+                  }
+                  className={
+                    index ===
+                    breadcrumbs.length - 1
+                      ? "active"
+                      : ""
                   }
                 >
                   {part}
                 </button>
 
               </div>
-
             )
           )}
 
         </div>
 
-
-        {/* ===================================================
-            FOLDER BROWSER
-        ================================================== */}
-
+        {/* FOLDER BROWSER */}
         <div className="github-folder-browser">
 
-
           {currentPath && (
-
             <button
               type="button"
               className="github-back-button"
-
-              onClick={
-                goBack
-              }
+              onClick={goBack}
             >
               ← Back
             </button>
-
           )}
-
 
           {loading ? (
 
-            <div className="github-folder-status">
-              Loading folders...
+            <div className="github-folder-loading">
+              <div className="folder-loading-spinner" />
+              <span>
+                Loading folders...
+              </span>
             </div>
 
           ) : error ? (
@@ -974,220 +835,190 @@ export default function GitHubUpload() {
               {error}
             </div>
 
-          ) : folders.length ? (
+          ) : filteredFolders.length ===
+            0 ? (
 
-            <div className="github-folder-list">
+            <div className="github-folder-empty">
 
-              {folders.map(
-                (folder) => (
+              <div className="github-folder-empty-icon">
+                ⌕
+              </div>
 
-                  <button
-                    type="button"
+              <h4>
+                No folders found
+              </h4>
 
-                    key={
-                      folder.path
-                    }
+              <p>
+                {folderSearch
+                  ? `No folders match "${folderSearch}".`
+                  : "This location has no subfolders."}
+              </p>
 
-                    className={
-                      "github-folder"
-                    }
-
-                    onClick={() =>
-                      openFolder(
-                        folder.path
-                      )
-                    }
-                  >
-
-                    <span className="github-folder-icon">
-                      📁
-                    </span>
-
-
-                    <span className="github-folder-name">
-                      {folder.name}
-                    </span>
-
-
-                    <span className="github-folder-arrow">
-                      →
-                    </span>
-
-                  </button>
-
-                )
+              {folderSearch && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFolderSearch("")
+                  }
+                >
+                  Clear search
+                </button>
               )}
 
             </div>
 
           ) : (
 
-            <div className="github-folder-status">
+            <div className="github-folder-list">
 
-              No subfolders in this location.
+             {filteredFolders.map((folder) => (
+  <button
+    key={folder.path}
+    type="button"
+    className="folder-card"
+    onClick={() => handleFolderClick(folder)}
+  >
+    <span className="folder-icon-wrap" aria-hidden="true">
+      <svg
+        className="folder-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M3 6.5C3 5.67 3.67 5 4.5 5H9L11 7H19.5C20.33 7 21 7.67 21 8.5V17.5C21 18.33 20.33 19 19.5 19H4.5C3.67 19 3 18.33 3 17.5V6.5Z"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+
+    <span className="folder-card-content">
+      <span
+        className="folder-card-name"
+        title={folder.name}
+      >
+        {folder.name}
+      </span>
+
+      <span className="folder-card-type">
+        Folder
+      </span>
+    </span>
+
+    <span className="folder-card-arrow" aria-hidden="true">
+      →
+    </span>
+  </button>
+))}
 
             </div>
 
           )}
 
-
-          {/* =================================================
-              EXISTING FILES
-          ================================================== */}
-
+          {/* EXISTING FILES */}
           {files.length > 0 && (
-
             <div className="github-existing-files">
 
               <h4>
                 Existing files
               </h4>
 
-
               {files.map(
                 (file) => (
-
                   <div
-                    key={
-                      file.path
-                    }
-
                     className="github-existing-file"
+                    key={
+                      file.path ||
+                      file.name
+                    }
                   >
-
                     <span>
                       📄
                     </span>
 
-
                     <span>
-                      {file.name}
+                      {
+                        file.name ||
+                        file.path
+                      }
                     </span>
-
                   </div>
-
                 )
               )}
 
             </div>
-
           )}
 
         </div>
 
       </div>
 
-
-      {/* =====================================================
-          SUCCESS / ERROR
-      ====================================================== */}
-
-      {uploadSuccess && (
-
-        <div className="github-upload-success">
-
-          ✓ {uploadSuccess}
-
-        </div>
-
-      )}
-
-
-      {uploadError && (
-
-        <div className="github-upload-error">
-
-          {uploadError}
-
-        </div>
-
-      )}
-
-
-      {/* =====================================================
-          COMMIT MESSAGE
-      ====================================================== */}
-
+      {/* COMMIT MESSAGE */}
       <div className="github-commit-section">
 
         <label>
           Commit message
         </label>
 
-
         <input
           type="text"
-
-          value={
-            commitMessage
-          }
-
+          value={commitMessage}
           onChange={(event) =>
             setCommitMessage(
               event.target.value
             )
           }
-
-          placeholder="Add new asset"
-
-          disabled={
-            uploading
-          }
+          placeholder="Add asset"
+          disabled={uploading}
         />
 
       </div>
 
-
-      {/* =====================================================
-          DESTINATION
-      ====================================================== */}
-
+      {/* DESTINATION PREVIEW */}
       <div className="github-selected-path">
 
         <span>
           Destination
         </span>
 
-
         <strong>
-
-          Adobe/
-
           {currentPath
-            ? `${currentPath}/`
-            : "Select a folder"}
-
+            ? `Adobe/${currentPath}/${
+                selectedFile?.name || ""
+              }`
+            : "Select a destination folder"}
         </strong>
 
       </div>
 
+      {/* MESSAGES */}
+      {uploadSuccess && (
+        <div className="github-upload-success">
+          ✓ {uploadSuccess}
+        </div>
+      )}
 
-      {/* =====================================================
-          UPLOAD
-      ====================================================== */}
+      {uploadError && (
+        <div className="github-upload-error">
+          {uploadError}
+        </div>
+      )}
 
+      {/* UPLOAD */}
       <button
         type="button"
-
         className="github-upload-button"
-
+        onClick={handleUpload}
         disabled={
+          uploading ||
           !selectedFile ||
-          !currentPath ||
-          uploading
-        }
-
-        onClick={
-          handleUpload
+          !currentPath
         }
       >
-
         {uploading
           ? "Uploading..."
           : "Upload to GitHub"}
-
       </button>
-
 
     </section>
   );
