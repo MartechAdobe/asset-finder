@@ -7,6 +7,8 @@ import Results from "./components/Results";
 import PreviewModal from "./components/PreviewModal";
 import ImageEditor from "./components/ImageEditor";
 import GitHubUpload from "./components/GitHubUpload";
+import MicrosoftLogin
+  from "./components/MicrosoftLogin";
 
 import {
   searchRepository,
@@ -367,6 +369,7 @@ export default function App() {
 
         </div>
 
+            <MicrosoftLogin />
       </header>
 
 
