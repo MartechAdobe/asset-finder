@@ -5,10 +5,13 @@ import SearchBar from "./components/SearchBar";
 import CategoryFilters from "./components/CategoryFilters";
 import ResultFilters
   from "./components/ResultFilters";
+  import SearchScope
+  from "./components/SearchScope";
 import Results from "./components/Results";
 import PreviewModal from "./components/PreviewModal";
 import ImageEditor from "./components/ImageEditor";
 import GitHubUpload from "./components/GitHubUpload";
+
 // import MicrosoftLogin
 //   from "./components/MicrosoftLogin";
 
@@ -37,6 +40,8 @@ export default function App() {
 
   const [results, setResults] = useState([]);
   const [query, setQuery] = useState("");
+  const [searchScope, setSearchScope] =
+  useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -140,7 +145,7 @@ setSortBy("relevance");
     setThumbnailHtml({});
 
     try {
-      const data = await searchRepository(searchQuery);
+      const data = await searchRepository(searchQuery,  searchScope);
 
       const searchResults = data.results || [];
 
@@ -297,13 +302,16 @@ setSortBy("relevance");
   // CATEGORY SEARCH
   // =========================================================
 
- function handleCategory(category) {
-
+ function handleCategory(
+  category
+) {
   if (!category) {
     setQuery("");
     setResults([]);
     setError("");
     setThumbnailHtml({});
+
+    setSearchScope("");
 
     setFileType("All");
     setSortBy("relevance");
@@ -445,6 +453,13 @@ setSortBy("relevance");
               loading={loading}
             />
 
+            <SearchScope
+  value={searchScope}
+  onChange={(value) =>
+    setSearchScope(value)
+  }
+/>
+
 
             {/* =================================================
                 TEMPORARY FOLDER TEST BUTTON
@@ -483,14 +498,23 @@ setSortBy("relevance");
 
           {/* SEARCH RESULTS */}
 
-          <Results
-            results={filteredResults}
-            query={query}
-            loading={loading}
-            onPreview={handlePreview}
-            onEdit={handleEdit}
-            thumbnailHtml={thumbnailHtml}
-          />
+       {query && (
+  <div className="search-context">
+    Searching in:{" "}
+    <strong>
+      {searchScope || "Entire repository"}
+    </strong>
+  </div>
+)}
+
+<Results
+  results={filteredResults}
+  query={query}
+  loading={loading}
+  onPreview={handlePreview}
+  onEdit={handleEdit}
+  thumbnailHtml={thumbnailHtml}
+/>
 
         </main>
       )}

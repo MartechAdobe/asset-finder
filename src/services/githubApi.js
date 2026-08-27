@@ -1,25 +1,32 @@
 const API_URL =
   "https://adobe-github-api.akshanshdogra.workers.dev";
 
-/**
- * Common API request helper
- */
-async function apiRequest(url, options = {}) {
+/* =========================================================
+   COMMON API REQUEST
+========================================================= */
+
+async function apiRequest(
+  url,
+  options = {}
+) {
   let response;
 
   try {
-    response = await fetch(url, options);
+    response = await fetch(
+      url,
+      options
+    );
   } catch (error) {
     throw new Error(
       "Unable to connect to the GitHub API Worker."
     );
   }
 
-  let data;
+  let data = {};
 
   try {
     data = await response.json();
-  } catch (error) {
+  } catch {
     throw new Error(
       `Worker returned an invalid response (${response.status}).`
     );
@@ -38,41 +45,69 @@ async function apiRequest(url, options = {}) {
 
 
 /* =========================================================
-   REPOSITORY SEARCH
-   ========================================================= */
+   SEARCH REPOSITORY
+========================================================= */
 
-export async function searchRepository(query) {
+export async function searchRepository(
+  query,
+  folder = ""
+) {
+  const params =
+    new URLSearchParams();
+
+  if (query?.trim()) {
+    params.set(
+      "q",
+      query.trim()
+    );
+  }
+
+  if (folder?.trim()) {
+    params.set(
+      "path",
+      folder.trim()
+    );
+  }
+
   return apiRequest(
-    `${API_URL}/search?q=${encodeURIComponent(query)}`
+    `${API_URL}/search?${params.toString()}`
   );
 }
 
 
 /* =========================================================
    GET FILE
-   ========================================================= */
+========================================================= */
 
-export async function getFile(path) {
+export async function getFile(
+  path
+) {
   return apiRequest(
-    `${API_URL}/file?path=${encodeURIComponent(path)}`
+    `${API_URL}/file?path=${encodeURIComponent(
+      path
+    )}`
   );
 }
 
 
 /* =========================================================
    GET RAW FILE
-   ========================================================= */
+========================================================= */
 
-export async function getRawFile(path) {
+export async function getRawFile(
+  path
+) {
   return apiRequest(
-    `${API_URL}/raw?path=${encodeURIComponent(path)}`
+    `${API_URL}/raw?path=${encodeURIComponent(
+      path
+    )}`
   );
 }
 
 
 /* =========================================================
    GET REPOSITORY
-   ========================================================= */
+========================================================= */
 
 export async function getRepository() {
   return apiRequest(
@@ -83,69 +118,28 @@ export async function getRepository() {
 
 /* =========================================================
    GET FOLDERS
-   =========================================================
-   
-   Example:
+========================================================= */
 
-   getFolders()
-
-   -> Root folders
-
-   getFolders("ACS summit")
-
-   -> Folders/files inside ACS summit
-
-   getFolders("ACS summit/Asset Finder Test")
-
-   -> Folders/files inside nested folder
-   ========================================================= */
-
-export async function getFolders(path = "") {
-  return apiRequest(
-    `${API_URL}/folders?path=${encodeURIComponent(path)}`
-  );
-}
-
-export async function searchRepositoryInFolder(
-  query,
-  folder = ""
+export async function getFolders(
+  path = ""
 ) {
-  const params = new URLSearchParams();
-
-  params.set("q", query);
-
-  if (folder) {
-    params.set("path", folder);
-  }
-
   return apiRequest(
-    `${API_URL}/search?${params.toString()}`
+    `${API_URL}/folders?path=${encodeURIComponent(
+      path
+    )}`
   );
 }
 
-const searchPath =
-  normalizePath(
-    url.searchParams.get("path") || ""
-  );
 
 /* =========================================================
    CREATE FOLDER
-   =========================================================
-
-   Example:
-
-   await createFolder({
-     path: "ACS summit/New Folder",
-     message: "Create new folder"
-   });
-
-   ========================================================= */
+========================================================= */
 
 export async function createFolder({
   path,
-  message = "Create folder"
+  message = "Create folder",
 }) {
-  if (!path || !path.trim()) {
+  if (!path?.trim()) {
     throw new Error(
       "Folder path is required."
     );
@@ -157,13 +151,14 @@ export async function createFolder({
       method: "POST",
 
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type":
+          "application/json",
       },
 
       body: JSON.stringify({
         path: path.trim(),
-        message
-      })
+        message,
+      }),
     }
   );
 }
@@ -171,34 +166,14 @@ export async function createFolder({
 
 /* =========================================================
    UPLOAD FILE
-   =========================================================
-
-   IMPORTANT:
-
-   The Worker expects:
-
-   contentBase64
-
-   NOT:
-
-   content
-
-   Example:
-
-   await uploadFile({
-     path: "ACS summit/Test/Template.html",
-     content: base64Content,
-     message: "Upload template"
-   });
-
-   ========================================================= */
+========================================================= */
 
 export async function uploadFile({
   path,
   content,
-  message = "Upload asset"
+  message = "Upload asset",
 }) {
-  if (!path || !path.trim()) {
+  if (!path?.trim()) {
     throw new Error(
       "File path is required."
     );
@@ -216,25 +191,24 @@ export async function uploadFile({
       method: "POST",
 
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type":
+          "application/json",
       },
 
       body: JSON.stringify({
         path: path.trim(),
-
-        // IMPORTANT:
-        // Worker expects contentBase64
         contentBase64: content,
-
-        message
-      })
+        message,
+      }),
     }
   );
 }
 
 
 /* =========================================================
-   EXPORT API URL
-   ========================================================= */
+   API URL
+========================================================= */
 
-export { API_URL };
+export {
+  API_URL,
+};

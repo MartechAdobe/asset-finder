@@ -8,7 +8,6 @@ export default function ResultFilters({
   const fileTypes = [
     "All",
     "HTML",
-    "HTM",
   ];
 
   return (
