@@ -3,12 +3,15 @@ import { useState } from "react";
 import TemplateEditor from "./components/TemplateEditor";
 import SearchBar from "./components/SearchBar";
 import CategoryFilters from "./components/CategoryFilters";
+import ResultFilters
+  from "./components/ResultFilters";
 import Results from "./components/Results";
 import PreviewModal from "./components/PreviewModal";
 import ImageEditor from "./components/ImageEditor";
 import GitHubUpload from "./components/GitHubUpload";
-import MicrosoftLogin
-  from "./components/MicrosoftLogin";
+// import MicrosoftLogin
+//   from "./components/MicrosoftLogin";
+
 
 import {
   searchRepository,
@@ -37,6 +40,12 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [fileType, setFileType] =
+  useState("All");
+
+const [sortBy, setSortBy] =
+  useState("relevance");
+
   // =========================================================
   // THUMBNAIL STATE
   // =========================================================
@@ -62,37 +71,58 @@ export default function App() {
   // TEMPORARY GITHUB FOLDER TEST
   // =========================================================
 
-  async function testFolders() {
-    console.log("=================================");
-    console.log("Testing GitHub Folder API...");
-    console.log("=================================");
+  const filteredResults =
+  [...results]
+    .filter((template) => {
 
-    try {
-      const data = await getFolders();
-
-      console.log("FOLDER API RESPONSE:");
-      console.log(data);
-
-      console.log("Folders:");
-
-      if (data?.folders) {
-        data.folders.forEach((folder, index) => {
-          console.log(
-            `${index + 1}. ${folder.name} → ${folder.path}`
-          );
-        });
+      if (fileType === "All") {
+        return true;
       }
 
-      console.log("=================================");
-      console.log("Folder API test completed.");
-      console.log("=================================");
-    } catch (error) {
-      console.error("=================================");
-      console.error("FOLDER API ERROR:");
-      console.error(error);
-      console.error("=================================");
-    }
-  }
+      const fileName =
+        template.path
+          ?.split("/")
+          .pop()
+          ?.toLowerCase() || "";
+
+      if (fileType === "HTML") {
+        return (
+          fileName.endsWith(".html") ||
+          fileName.endsWith(".htm")
+        );
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+
+      if (sortBy === "az") {
+        return String(
+          a.title || a.path || ""
+        ).localeCompare(
+          String(
+            b.title || b.path || ""
+          )
+        );
+      }
+
+      if (sortBy === "za") {
+        return String(
+          b.title || b.path || ""
+        ).localeCompare(
+          String(
+            a.title || a.path || ""
+          )
+        );
+      }
+
+      return (
+        Number(b.score || 0) -
+        Number(a.score || 0)
+      );
+    });
+
+ 
 
   // =========================================================
   // SEARCH
@@ -102,6 +132,9 @@ export default function App() {
     setLoading(true);
     setError("");
     setQuery(searchQuery);
+
+    setFileType("All");
+setSortBy("relevance");
 
     // Clear previous thumbnails
     setThumbnailHtml({});
@@ -264,13 +297,22 @@ export default function App() {
   // CATEGORY SEARCH
   // =========================================================
 
-  function handleCategory(category) {
-    if (!category) {
-      return;
-    }
+ function handleCategory(category) {
 
-    handleSearch(category);
+  if (!category) {
+    setQuery("");
+    setResults([]);
+    setError("");
+    setThumbnailHtml({});
+
+    setFileType("All");
+    setSortBy("relevance");
+
+    return;
   }
+
+  handleSearch(category);
+}
 
   // =========================================================
   // RENDER
@@ -369,7 +411,7 @@ export default function App() {
 
         </div>
 
-            <MicrosoftLogin />
+            {/* <MicrosoftLogin /> */}
       </header>
 
 
@@ -408,22 +450,7 @@ export default function App() {
                 TEMPORARY FOLDER TEST BUTTON
             ================================================== */}
 
-            <button
-              type="button"
-              onClick={testFolders}
-              style={{
-                marginTop: "20px",
-                padding: "10px 16px",
-                borderRadius: "8px",
-                border: "1px solid #444",
-                background: "#222",
-                color: "#fff",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-            >
-              Test GitHub Folders
-            </button>
+           
 
 
             {/* CATEGORY FILTERS */}
@@ -431,6 +458,16 @@ export default function App() {
             <CategoryFilters
               onSelect={handleCategory}
             />
+
+            {results.length > 0 && (
+  <ResultFilters
+    results={filteredResults}
+    fileType={fileType}
+    onFileTypeChange={setFileType}
+    sortBy={sortBy}
+    onSortChange={setSortBy}
+  />
+)}
 
           </section>
 
@@ -447,7 +484,7 @@ export default function App() {
           {/* SEARCH RESULTS */}
 
           <Results
-            results={results}
+            results={filteredResults}
             query={query}
             loading={loading}
             onPreview={handlePreview}

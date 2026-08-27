@@ -106,6 +106,27 @@ export async function getFolders(path = "") {
   );
 }
 
+export async function searchRepositoryInFolder(
+  query,
+  folder = ""
+) {
+  const params = new URLSearchParams();
+
+  params.set("q", query);
+
+  if (folder) {
+    params.set("path", folder);
+  }
+
+  return apiRequest(
+    `${API_URL}/search?${params.toString()}`
+  );
+}
+
+const searchPath =
+  normalizePath(
+    url.searchParams.get("path") || ""
+  );
 
 /* =========================================================
    CREATE FOLDER
