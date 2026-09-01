@@ -871,43 +871,43 @@ export default function GitHubUpload() {
 
             <div className="github-folder-list">
 
-             {filteredFolders.map((folder) => (
+            {filteredFolders.map((folder) => (
   <button
     key={folder.path}
     type="button"
-    className="folder-card"
-    onClick={() => handleFolderClick(folder)}
+    className="github-folder-card"
+    onClick={() => openFolder(folder.path)}
+    title={`Open ${folder.name}`}
   >
-    <span className="folder-icon-wrap" aria-hidden="true">
+    <div className="github-folder-card-icon">
       <svg
-        className="folder-icon"
         viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
       >
         <path
-          d="M3 6.5C3 5.67 3.67 5 4.5 5H9L11 7H19.5C20.33 7 21 7.67 21 8.5V17.5C21 18.33 20.33 19 19.5 19H4.5C3.67 19 3 18.33 3 17.5V6.5Z"
+          d="M3.5 6.75A1.75 1.75 0 0 1 5.25 5h4.2l1.7 1.75h7.6A1.75 1.75 0 0 1 20.5 8.5v8.25a2.25 2.25 0 0 1-2.25 2.25H5.75a2.25 2.25 0 0 1-2.25-2.25V6.75Z"
           fill="currentColor"
         />
       </svg>
-    </span>
+    </div>
 
-    <span className="folder-card-content">
+    <div className="github-folder-card-body">
       <span
-        className="folder-card-name"
-        title={folder.name}
+        className="github-folder-card-name"
       >
         {folder.name}
       </span>
 
-      <span className="folder-card-type">
+      <span
+        className="github-folder-card-meta"
+      >
         Folder
       </span>
-    </span>
+    </div>
 
-    <span className="folder-card-arrow" aria-hidden="true">
+    <div className="github-folder-card-arrow">
       →
-    </span>
+    </div>
   </button>
 ))}
 

@@ -12,6 +12,9 @@ import PreviewModal from "./components/PreviewModal";
 import ImageEditor from "./components/ImageEditor";
 import GitHubUpload from "./components/GitHubUpload";
 
+import FigmaAssetFinder
+  from "./components/FigmaAssetFinder";
+
 // import MicrosoftLogin
 //   from "./components/MicrosoftLogin";
 
@@ -391,6 +394,20 @@ setSortBy("relevance");
             Image Editor
           </button>
 
+          <button
+  type="button"
+  className={
+    activePage === "figma"
+      ? "nav-item active"
+      : "nav-item"
+  }
+  onClick={() =>
+    setActivePage("figma")
+  }
+>
+  Figma Asset Finder
+</button>
+
           {/* GITHUB UPLOAD */}
 
           <button
@@ -544,6 +561,11 @@ setSortBy("relevance");
 
         </main>
       )}
+
+  {activePage === "figma" && (
+  <FigmaAssetFinder />
+)}
+      
 
 
       {/* =====================================================
