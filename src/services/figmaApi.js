@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:3000";
+const API_URL =
+  import.meta.env.VITE_FIGMA_API_URL ||
+  "http://localhost:3000";
 
 /* =========================================================
    COMMON API REQUEST
@@ -21,7 +23,7 @@ async function apiRequest(url) {
     data = await response.json();
   } catch {
     throw new Error(
-      `API returned an invalid response (${response.status}).`
+      `Invalid API response (${response.status}).`
     );
   }
 
@@ -38,7 +40,7 @@ async function apiRequest(url) {
 
 
 /* =========================================================
-   GET FIGMA FILES
+   GET ALL FIGMA FILES
 ========================================================= */
 
 export async function getFigmaFiles() {
@@ -52,42 +54,90 @@ export async function getFigmaFiles() {
    SEARCH ALL FIGMA FILES
 ========================================================= */
 
-export async function searchFigmaAssets(query) {
+export async function searchFigmaAssets(
+  query,
+  options = {}
+) {
   if (!query?.trim()) {
     throw new Error(
       "Search query is required."
     );
   }
 
-  return apiRequest(
-    `${API_URL}/figma/search-all?q=${encodeURIComponent(
-      query.trim()
-    )}`
+  const params = new URLSearchParams();
+
+  params.set(
+    "q",
+    query.trim()
   );
-}
 
+  if (options.limit !== undefined) {
+    params.set(
+      "limit",
+      String(options.limit)
+    );
+  }
 
-/* =========================================================
-   GET SINGLE FIGMA FILE
-========================================================= */
+  if (options.preview !== undefined) {
+    params.set(
+      "preview",
+      String(options.preview)
+    );
+  }
 
-export async function getFigmaFile(fileKey) {
-  if (!fileKey) {
-    throw new Error(
-      "Figma file key is required."
+  if (options.type) {
+    params.set(
+      "type",
+      options.type
+    );
+  }
+
+  if (options.fileKey) {
+    params.set(
+      "fileKey",
+      options.fileKey
+    );
+  }
+
+  if (options.pageName) {
+    params.set(
+      "pageName",
+      options.pageName
     );
   }
 
   return apiRequest(
-    `${API_URL}/figma/file?fileKey=${encodeURIComponent(
+    `${API_URL}/figma/search-all?${params.toString()}`
+  );
+}
+
+
+/* =========================================================
+   GET SINGLE FIGMA ASSET
+========================================================= */
+
+export async function getFigmaAsset(
+  fileKey,
+  nodeId
+) {
+  if (!fileKey || !nodeId) {
+    throw new Error(
+      "Figma file key and node ID are required."
+    );
+  }
+
+  return apiRequest(
+    `${API_URL}/figma/asset?fileKey=${encodeURIComponent(
       fileKey
+    )}&nodeId=${encodeURIComponent(
+      nodeId
     )}`
   );
 }
 
 
 /* =========================================================
-   GET FIGMA NODE PREVIEW
+   GET FIGMA PREVIEW
 ========================================================= */
 
 export async function getFigmaPreview(
@@ -110,10 +160,6 @@ export async function getFigmaPreview(
 }
 
 
-/* =========================================================
-   API URL
-========================================================= */
-
 export {
-  API_URL,
+  API_URL
 };

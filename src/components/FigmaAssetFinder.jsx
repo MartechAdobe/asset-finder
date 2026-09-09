@@ -1,8 +1,11 @@
 import { useState } from "react";
 
 import {
-  searchFigmaAssets,
+  searchFigmaAssets
 } from "../services/figmaApi";
+
+// import "../figma.css";
+
 
 export default function FigmaAssetFinder() {
 
@@ -18,86 +21,135 @@ export default function FigmaAssetFinder() {
   const [error, setError] =
     useState("");
 
+  const [searched, setSearched] =
+    useState(false);
 
-  async function handleSearch() {
 
-    if (!query.trim()) {
+  async function handleSearch(event) {
+
+    event?.preventDefault();
+
+    const searchQuery =
+      query.trim();
+
+    if (!searchQuery) {
       return;
     }
 
     setLoading(true);
     setError("");
-    setResults([]);
+    setSearched(true);
 
     try {
 
       const data =
         await searchFigmaAssets(
-          query
+          searchQuery,
+          {
+            limit: 20,
+            preview: true
+          }
         );
 
       setResults(
         data.results || []
       );
 
-    } catch (err) {
+    } catch (error) {
 
       console.error(
         "Figma search failed:",
-        err
+        error
       );
 
       setError(
-        err.message
+        error.message
       );
+
+      setResults([]);
 
     } finally {
 
       setLoading(false);
 
     }
+  }
+
+
+  function clearSearch() {
+
+    setQuery("");
+    setResults([]);
+    setError("");
+    setSearched(false);
 
   }
 
 
   return (
-    <main>
+    <main className="figma-page">
 
-      <section className="hero">
+      {/* =================================================
+          HERO
+      ================================================= */}
 
-        <p className="eyebrow">
-          FIGMA ASSET SEARCH
-        </p>
+      <section className="figma-hero">
 
-        <h2>
+        <div className="figma-eyebrow">
+          FIGMA ASSET FINDER
+        </div>
+
+        <h1>
           Find design assets.
-        </h2>
+        </h1>
 
         <p>
-          Search across your connected
-          Figma files for components,
-          frames, text and other assets.
+          Search across your Figma files
+          and quickly find the exact
+          component, template or design
+          asset you need.
         </p>
 
-        <div>
 
-          <input
-            type="text"
-            value={query}
-            placeholder="Search Figma assets..."
-            onChange={(event) =>
-              setQuery(event.target.value)
-            }
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                handleSearch();
+        <form
+          className="figma-search"
+          onSubmit={handleSearch}
+        >
+
+          <div className="figma-search-input">
+
+            <span className="figma-search-icon">
+              ⌕
+            </span>
+
+            <input
+              type="text"
+              value={query}
+              placeholder="Search Figma assets..."
+              onChange={(event) =>
+                setQuery(
+                  event.target.value
+                )
               }
-            }}
-          />
+              disabled={loading}
+            />
+
+            {query && (
+              <button
+                type="button"
+                className="figma-clear"
+                onClick={clearSearch}
+              >
+                ×
+              </button>
+            )}
+
+          </div>
+
 
           <button
-            type="button"
-            onClick={handleSearch}
+            type="submit"
+            className="figma-search-button"
             disabled={
               loading ||
               !query.trim()
@@ -108,62 +160,224 @@ export default function FigmaAssetFinder() {
               : "Search"}
           </button>
 
-        </div>
+        </form>
 
       </section>
 
 
+      {/* =================================================
+          ERROR
+      ================================================= */}
+
       {error && (
-        <div className="error-message">
-          {error}
+
+        <div className="figma-error">
+
+          <strong>
+            Search failed
+          </strong>
+
+          <span>
+            {error}
+          </span>
+
         </div>
+
       )}
 
 
-      <section>
+      {/* =================================================
+          LOADING
+      ================================================= */}
 
-        {results.map((asset) => (
+      {loading && (
 
-          <article
-            key={asset.assetId}
-          >
+        <section className="figma-loading">
 
-            {asset.previewUrl && (
-              <img
-                src={asset.previewUrl}
-                alt={asset.name}
-              />
-            )}
+          <div className="figma-spinner" />
 
-            <h3>
-              {asset.name}
-            </h3>
+          <p>
+            Searching your Figma assets...
+          </p>
 
-            <p>
-              File: {asset.fileName}
-            </p>
+        </section>
 
-            <p>
-              Page: {asset.pageName}
-            </p>
+      )}
 
-            <p>
-              Type: {asset.type}
-            </p>
 
-            <a
-              href={asset.figmaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open in Figma ↗
-            </a>
+      {/* =================================================
+          RESULTS
+      ================================================= */}
 
-          </article>
+      {!loading &&
+        searched &&
+        !error && (
 
-        ))}
+        <section className="figma-results">
 
-      </section>
+          <div className="figma-results-header">
+
+            <div>
+
+              <h2>
+                Search results
+              </h2>
+
+              <p>
+                {results.length} asset
+                {results.length !== 1
+                  ? "s"
+                  : ""}{" "}
+                found for "
+                {query}"
+              </p>
+
+            </div>
+
+          </div>
+
+
+          {results.length === 0 ? (
+
+            <div className="figma-no-results">
+
+              <div className="figma-no-results-icon">
+                ∅
+              </div>
+
+              <h3>
+                No results found
+              </h3>
+
+              <p>
+                Try a different keyword,
+                component name or template
+                title.
+              </p>
+
+            </div>
+
+          ) : (
+
+            <div className="figma-results-grid">
+
+              {results.map((asset) => (
+
+                <article
+                  className="figma-card"
+                  key={
+                    asset.assetId ||
+                    `${asset.fileKey}-${asset.nodeId}`
+                  }
+                >
+
+                  {/* Preview */}
+
+                  <div className="figma-card-preview">
+
+                    {asset.previewUrl ? (
+
+                      <img
+                        src={asset.previewUrl}
+                        alt={asset.name}
+                        loading="lazy"
+                      />
+
+                    ) : (
+
+                      <div className="figma-no-preview">
+                        No preview available
+                      </div>
+
+                    )}
+
+                  </div>
+
+
+                  {/* Content */}
+
+                  <div className="figma-card-content">
+
+                    <div className="figma-card-type">
+                      {asset.type}
+                    </div>
+
+                    <h3>
+                      {asset.name}
+                    </h3>
+
+
+                    {asset.fileName && (
+
+                      <div className="figma-meta">
+
+                        <span>
+                          File
+                        </span>
+
+                        <strong>
+                          {asset.fileName}
+                        </strong>
+
+                      </div>
+
+                    )}
+
+
+                    {asset.pageName && (
+
+                      <div className="figma-meta">
+
+                        <span>
+                          Page
+                        </span>
+
+                        <strong>
+                          {asset.pageName}
+                        </strong>
+
+                      </div>
+
+                    )}
+
+
+                    {asset.description && (
+
+                      <p className="figma-description">
+                        {asset.description}
+                      </p>
+
+                    )}
+
+
+                    <div className="figma-card-actions">
+
+                      <a
+                        href={
+                          asset.figmaUrl
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="figma-open-button"
+                      >
+                        Open in Figma ↗
+                      </a>
+
+                    </div>
+
+                  </div>
+
+                </article>
+
+              ))}
+
+            </div>
+
+          )}
+
+        </section>
+
+      )}
 
     </main>
   );
