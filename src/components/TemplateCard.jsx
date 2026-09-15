@@ -33,31 +33,27 @@ export default function TemplateCard({
         }}
       >
 
-        {extension === "HTML" && thumbnailHtml ? (
-
-          <iframe
-            srcDoc={thumbnailHtml}
-            title={`Preview of ${fileName}`}
-            className="thumbnail-frame"
-            sandbox=""
-            tabIndex="-1"
-          />
-
-        ) : extension === "HTML" ? (
-
-          <div className="thumbnail-loading">
-            <span>
-              Loading preview...
-            </span>
-          </div>
-
-        ) : (
-
-          <div className="template-icon">
-            FILE
-          </div>
-
-        )}
+       {extension === "HTML" && thumbnailHtml ? (
+  <iframe
+    srcDoc={thumbnailHtml}
+    title={fileName}
+    className="html-thumbnail"
+    sandbox=""
+  />
+) : extension === "HTML" ? (
+  <div className="thumbnail-loading">
+    <span>Loading preview...</span>
+  </div>
+) : template.type === "image" && template.raw_url ? (
+  <img
+    src={template.raw_url}
+    alt={fileName}
+    className="image-thumbnail"
+    loading="lazy"
+  />
+) : (
+  <div className="template-icon">FILE</div>
+)}
 
 
         {extension === "HTML" && (
