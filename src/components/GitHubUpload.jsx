@@ -512,7 +512,7 @@ export default function GitHubUpload() {
 
         <p>
           Choose any folder in the Adobe
-          repository, including nested folders.
+          repository, including nested folders.(Maximum upload limit 100 MB at a time.)
         </p>
       </div>
 
@@ -595,7 +595,7 @@ export default function GitHubUpload() {
             </h3>
 
             <span>
-              MartechAdobe / Adobe
+               Adobe
             </span>
           </div>
 
@@ -699,7 +699,7 @@ export default function GitHubUpload() {
             <strong>
               {currentPath
                 ? `Adobe / ${currentPath}`
-                : "MartechAdobe / Adobe"}
+                : "Adobe"}
             </strong>
           </div>
 

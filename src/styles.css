@@ -143,7 +143,7 @@ textarea:focus-visible {
 
   border-radius: 9px;
 
-  background: #fa0f00;
+  /* background: #fa0f00; */
 
   color: #fff;
 
@@ -826,6 +826,30 @@ main {
   cursor: pointer;
 }
 
+/* HTML template thumbnail */
+.template-thumbnail iframe.html-thumbnail {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 920px;
+  height: 1200px;
+
+  border: 0;
+
+  transform-origin: top left;
+  transform: scale(0.25);
+
+  pointer-events: none;
+  background: #fff;
+}
+
+.template-thumbnail .image-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
 .thumbnail-frame {
   position: absolute;
 
@@ -902,6 +926,9 @@ main {
 
   background: rgba(0, 0, 0, 0.18);
 }
+
+
+
 
 /* NON HTML ICON */
 
@@ -2504,7 +2531,7 @@ footer a:hover {
 }
 
 .github-upload-heading p:last-child {
-  max-width: 620px;
+  /* max-width: 620px; */
 
   margin-top: 13px;
 

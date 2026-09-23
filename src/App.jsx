@@ -11,6 +11,7 @@ import Results from "./components/Results";
 import PreviewModal from "./components/PreviewModal";
 import ImageEditor from "./components/ImageEditor";
 import GitHubUpload from "./components/GitHubUpload";
+import logo from "../public/favicon.png"
 
 import FigmaAssetFinder
   from "./components/FigmaAssetFinder";
@@ -189,12 +190,67 @@ setSortBy("relevance");
           continue;
         }
 
-        const html = decodeBase64(fileData.content);
+        // const html = decodeBase64(fileData.content);
 
-        setThumbnailHtml((previous) => ({
-          ...previous,
-          [template.path]: html,
-        }));
+      const html = decodeBase64(fileData.content);
+
+const thumbnailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <style>
+
+    html,
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      overflow-x: hidden !important;
+      background: #ffffff !important;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    img {
+      max-width: 100% !important;
+      height: auto;
+    }
+
+    table {
+      max-width: 100% !important;
+    }
+
+    body > table,
+    body > div,
+    body > center {
+      max-width: 100% !important;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  ${html}
+
+</body>
+</html>
+`;
+
+setThumbnailHtml((previous) => ({
+  ...previous,
+  [template.path]: thumbnailHtml,
+}));
       } catch (error) {
         console.error(
           "Thumbnail failed:",
@@ -343,7 +399,7 @@ setSortBy("relevance");
         <div className="brand">
 
           <div className="adobe-mark">
-            A
+            <img src={logo} alt="" width="100%"/>
           </div>
 
           <div>
@@ -351,9 +407,9 @@ setSortBy("relevance");
               Adobe Template Finder
             </h1>
 
-            <span>
+            {/* <span>
               MartechAdobe / Adobe
-            </span>
+            </span> */}
           </div>
 
         </div>

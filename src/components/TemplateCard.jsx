@@ -33,7 +33,7 @@ export default function TemplateCard({
         }}
       >
 
-       {extension === "HTML" && thumbnailHtml ? (
+      {extension === "HTML" && thumbnailHtml ? (
   <iframe
     srcDoc={thumbnailHtml}
     title={fileName}
