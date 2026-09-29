@@ -580,7 +580,7 @@ setThumbnailHtml((previous) => ({
 
           <div>
             <h1>
-              Adobe Template Finder
+              GML Search Engine 
             </h1>
 
             {/* <span>
