@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { parseSearchQuery } from "./services/aiSearchApi";
+
 import TemplateEditor from "./components/TemplateEditor";
 import SearchBar from "./components/SearchBar";
 import CategoryFilters from "./components/CategoryFilters";
@@ -54,6 +56,7 @@ export default function App() {
 
 const [sortBy, setSortBy] =
   useState("relevance");
+const [aiFilters, setAiFilters] = useState(null);
 
   // =========================================================
   // THUMBNAIL STATE
@@ -76,25 +79,175 @@ const [sortBy, setSortBy] =
 
   const [activePage, setActivePage] = useState("finder");
 
+// =========================================================
+// AI SEARCH TEST
+// =========================================================
+
+async function testAiSearch() {
+  try {
+    const result = await parseSearchQuery(
+      "Find 2026 summit banners for email"
+    );
+
+    console.log("AI RESULT:", result);
+  } catch (error) {
+    console.error("AI SEARCH ERROR:", error);
+  }
+}
+
   // =========================================================
   // TEMPORARY GITHUB FOLDER TEST
   // =========================================================
 
-  const filteredResults =
+  // =========================================================
+  // AI ASSET TYPE DETECTION
+  // =========================================================
+
+  function matchesAssetType(template, assetType) {
+    if (!assetType) return true;
+
+    const path = String(template.path || "").toLowerCase();
+    const fileName = path.split("/").pop() || "";
+    const type = String(assetType).toLowerCase().trim();
+
+    if (type === "image" || type === "images") {
+      return (
+        fileName.endsWith(".png") ||
+        fileName.endsWith(".jpg") ||
+        fileName.endsWith(".jpeg") ||
+        fileName.endsWith(".gif") ||
+        fileName.endsWith(".webp") ||
+        fileName.endsWith(".svg")
+      );
+    }
+
+    if (type === "html" || type === "html template") {
+      return (
+        fileName.endsWith(".html") ||
+        fileName.endsWith(".htm")
+      );
+    }
+
+    if (type === "video" || type === "videos") {
+      return (
+        fileName.endsWith(".mp4") ||
+        fileName.endsWith(".mov") ||
+        fileName.endsWith(".webm") ||
+        fileName.endsWith(".m4v")
+      );
+    }
+
+    if (type === "banner" || type === "banners") {
+      return (
+        path.includes("banner") ||
+        fileName.includes("banner")
+      );
+    }
+
+    if (type === "template" || type === "templates") {
+      return (
+        fileName.endsWith(".html") ||
+        fileName.endsWith(".htm") ||
+        path.includes("template")
+      );
+    }
+
+    if (type === "component" || type === "components") {
+      return path.includes("component");
+    }
+
+    return true;
+  }
+
+ const filteredResults =
   [...results]
     .filter((template) => {
+
+      const path =
+        String(template.path || "");
+
+      const pathSegments =
+        path
+          .split("/")
+          .map(segment =>
+            segment.trim().toLowerCase()
+          );
+
+      // =====================================================
+      // AI YEAR FILTER
+      // Example:
+      // 2024 -> 2024/...
+      // 2026 -> 2026/...
+      // =====================================================
+
+      if (aiFilters?.year) {
+
+        const requestedYear =
+          String(aiFilters.year)
+            .trim()
+            .toLowerCase();
+
+        if (
+          !pathSegments.includes(
+            requestedYear
+          )
+        ) {
+          return false;
+        }
+      }
+
+      // =====================================================
+      // AI QUARTER FILTER
+      // Example:
+      // FY26_Q1
+      // =====================================================
+
+      if (aiFilters?.quarter) {
+
+        const requestedQuarter =
+          String(aiFilters.quarter)
+            .trim()
+            .toLowerCase();
+
+        if (
+          !pathSegments.includes(
+            requestedQuarter
+          )
+        ) {
+          return false;
+        }
+      }
+
+      // =====================================================
+      // AI ASSET TYPE FILTER
+      // =====================================================
+
+      if (
+        aiFilters?.assetType &&
+        !matchesAssetType(
+          template,
+          aiFilters.assetType
+        )
+      ) {
+        return false;
+      }
+
+      // =====================================================
+      // EXISTING FILE TYPE FILTER
+      // =====================================================
 
       if (fileType === "All") {
         return true;
       }
 
       const fileName =
-        template.path
-          ?.split("/")
+        path
+          .split("/")
           .pop()
           ?.toLowerCase() || "";
 
       if (fileType === "HTML") {
+
         return (
           fileName.endsWith(".html") ||
           fileName.endsWith(".htm")
@@ -103,9 +256,15 @@ const [sortBy, setSortBy] =
 
       return true;
     })
+
+    // =======================================================
+    // SORT
+    // =======================================================
+
     .sort((a, b) => {
 
       if (sortBy === "az") {
+
         return String(
           a.title || a.path || ""
         ).localeCompare(
@@ -116,6 +275,7 @@ const [sortBy, setSortBy] =
       }
 
       if (sortBy === "za") {
+
         return String(
           b.title || b.path || ""
         ).localeCompare(
@@ -133,39 +293,54 @@ const [sortBy, setSortBy] =
 
  
 
+    
+
   // =========================================================
   // SEARCH
   // =========================================================
 
   async function handleSearch(searchQuery) {
-    setLoading(true);
-    setError("");
-    setQuery(searchQuery);
+  setLoading(true);
+  setError("");
+  setQuery(searchQuery);
 
-    setFileType("All");
-setSortBy("relevance");
+  setFileType("All");
+  setSortBy("relevance");
 
-    // Clear previous thumbnails
-    setThumbnailHtml({});
+  setThumbnailHtml({});
 
-    try {
-      const data = await searchRepository(searchQuery,  searchScope);
+  try {
+    // Parse natural-language query using AI
+    const aiQuery = await parseSearchQuery(searchQuery);
 
-      const searchResults = data.results || [];
+    console.log("AI QUERY:", aiQuery);
 
-      setResults(searchResults);
+    // Save AI filters
+    setAiFilters(aiQuery);
 
-      // Load thumbnails for HTML results
-      loadThumbnails(searchResults);
-    } catch (err) {
-      console.error("Search failed:", err);
+    // Search GitHub using the main search term
+    const data = await searchRepository(
+      aiQuery.query || searchQuery,
+      searchScope
+    );
 
-      setError(err.message);
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
+    const searchResults = data.results || [];
+
+    setResults(searchResults);
+
+    loadThumbnails(searchResults);
+
+  } catch (err) {
+    console.error("Search failed:", err);
+
+    setError(err.message);
+    setResults([]);
+    setAiFilters(null);
+
+  } finally {
+    setLoading(false);
   }
+}
 
   // =========================================================
   // LOAD HTML THUMBNAILS
@@ -374,6 +549,7 @@ setThumbnailHtml((previous) => ({
 
     setFileType("All");
     setSortBy("relevance");
+    setAiFilters(null);
 
     return;
   }
@@ -525,6 +701,13 @@ setThumbnailHtml((previous) => ({
               onSearch={handleSearch}
               loading={loading}
             />
+
+            {/* <button
+  type="button"
+  onClick={testAiSearch}
+>
+  Test AI Search
+</button> */}
 
             <SearchScope
   value={searchScope}
